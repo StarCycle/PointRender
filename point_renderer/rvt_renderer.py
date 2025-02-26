@@ -13,8 +13,9 @@ class RVTBoxRenderer():
 
     def __init__(
         self,
+        center,
         img_size,
-        radius=0.012,
+        radius=0.006,
         default_color=0.0,
         default_depth=-1.0,
         antialiasing_factor=1,
@@ -46,6 +47,7 @@ class RVTBoxRenderer():
 
         # Pre-compute fixed cameras ahead of time
         self.cameras = self._get_cube_cameras(
+            center=center,
             img_size=self.img_size,
             orthographic=not pers,
             no_down=no_down,
@@ -75,6 +77,7 @@ class RVTBoxRenderer():
 
     def _get_cube_cameras(
         self,
+        center,
         img_size,
         orthographic,
         no_down,
@@ -92,6 +95,11 @@ class RVTBoxRenderer():
             "left": {"eye": [0, -1, 0], "at": [0, 0, 0], "up": [0, 0, 1]},
             "right": {"eye": [0, 0.5, 0], "at": [0, 0, 0], "up": [0, 0, 1]},
         }
+
+        for key in cam_dict:
+            for i in range(3):
+                cam_dict[key]['eye'][i] += center[i]
+                cam_dict[key]['at'][i] += center[i]
 
         assert not (two_views and three_views)
         assert not (one_view and three_views)
@@ -126,8 +134,8 @@ class RVTBoxRenderer():
 
         if orthographic:
             # img_sizes_w specifies height and width dimensions of the image in world coordinates
-            # [2, 2] means it will image coordinates from -1 to 1 in the camera frame
-            cameras = OrthographicCameras.from_lookat(eyes, ats, ups, img_sizes_w=[2, 2], img_size_px=img_size)
+            # [1, 1] means it will image coordinates from -0.5 to 0.5 in the camera frame
+            cameras = OrthographicCameras.from_lookat(eyes, ats, ups, img_sizes_w=[1, 1], img_size_px=img_size)
         else:
             cameras = PerspectiveCameras.from_lookat(eyes, ats, ups, hfov=70, img_size=img_size)
         return cameras
