@@ -8,7 +8,7 @@ import point_renderer.rvt_ops as rvt_ops
 class RVTBoxRenderer():
     """
     Wrapper around PointRenderer that fixes the cameras to be orthographic cameras
-    on the faces of a 2x2x2 cube placed at the origin
+    on the faces of a 1x1x1 cube placed at the origin
     """
 
     def __init__(
